@@ -51,10 +51,10 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build ios --release --no-codesign
-      - run: find ./ -iname  "*.app"
-      - run: pwd
+      - run: mkdir -p pyload
+      - run: cp -raf ./build/ios/iphoneos/Runner.app pyload/
       - uses: actions/upload-artifact@v2
         with:
           name: ios
-          path: "./build/ios/iphoneos/Runner.app"
+          path: "./pyload"
       
