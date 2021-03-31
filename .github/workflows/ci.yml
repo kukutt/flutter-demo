@@ -50,9 +50,10 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: flutter test
-      - run: flutter build ios --release --no-codesign
+      - run: flutter build ipa
+      - run: find . -name "*.ipa"
       - run: mkdir -p pyload
-      - run: cp -af ./build/ios/iphoneos/Runner.app pyload/
+      #- run: cp -af ./build/ios/iphoneos/Runner.app pyload/
       - uses: actions/upload-artifact@v2
         with:
           name: ios
