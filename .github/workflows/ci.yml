@@ -73,7 +73,7 @@ jobs:
       - run: flutter test
       #- run: flutter build ipa
       - run: flutter build ios --release --no-codesign
-      - run: ls ios/ -l
+      - run: ls ios/ 
       - run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
       #- run: find . -name "*.ipa"
       - run: mkdir -p pyload
