@@ -68,10 +68,13 @@ jobs:
         run: |
           keychain initialize
           keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password ${{ secrets.cert_password }}
+      - run: xcode-project use-profiles
       - run: flutter pub get
       - run: flutter test
       #- run: flutter build ipa
       - run: flutter build ios --release --no-codesign
+      - run: ls ios/ -l
+      - run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
       #- run: find . -name "*.ipa"
       - run: mkdir -p pyload
       - run: cp -af ./build/ios/iphoneos/Runner.app pyload/
