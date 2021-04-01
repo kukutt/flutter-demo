@@ -48,10 +48,30 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           channel: stable
+      - name: Gen certificates and profiles
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mkdir -p ~/Library/MobileDevice/Certificates/
+          # cat filename | base64 -w 0
+          echo ${{ secrets.P12_BASE64 }} | base64 -D > ~/Library/MobileDevice/Certificates/certificate.p12
+          echo ${{ secrets.MOBILEPROVISION_BASE64 }} | base64 -D > ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
+          md5 ~/Library/MobileDevice/Certificates/certificate.p12
+          md5 ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
+      #install the necessary dependencies
+      - name: Install python and codemagic tools
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install python dependencies
+        run:  python -m pip install codemagic-cli-tools
+      - name: Initialize Keychain with certificate
+        run: |
+          keychain initialize
+          keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password ${{ secrets.cert_password }}
       - run: flutter pub get
       - run: flutter test
       #- run: flutter build ipa
-      - run: flutter build ios --release 
+      - run: flutter build ios --release --no-codesign
       #- run: find . -name "*.ipa"
       - run: mkdir -p pyload
       - run: cp -af ./build/ios/iphoneos/Runner.app pyload/
