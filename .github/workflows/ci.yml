@@ -57,7 +57,6 @@ jobs:
           echo ${{ secrets.MOBILEPROVISION_BASE64 }} | base64 -D > ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
           md5 ~/Library/MobileDevice/Certificates/certificate.p12
           md5 ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
-      #install the necessary dependencies
       - name: Install python and codemagic tools
         uses: actions/setup-python@v2
         with:
@@ -72,14 +71,9 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build ios --release --no-codesign
-      - run: flutter build ipa
-      - run: ls ios/ 
-      #- run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
-      - run: find . -name "*.ipa"
-      - run: mkdir -p pyload
-      - run: cp -af ./build/ios/iphoneos/Runner.app pyload/
+      - run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
       - uses: actions/upload-artifact@v2
         with:
           name: ios
-          path: "./pyload"
+          path: "./build/ios/ipa/demo.ipa"
       
