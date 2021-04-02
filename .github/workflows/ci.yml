@@ -71,8 +71,8 @@ jobs:
       - run: xcode-project use-profiles
       - run: flutter pub get
       - run: flutter test
-      #- run: flutter build ipa
       - run: flutter build ios --release --no-codesign
+      - run: flutter build ipa
       - run: ls ios/ 
       - run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
       #- run: find . -name "*.ipa"
