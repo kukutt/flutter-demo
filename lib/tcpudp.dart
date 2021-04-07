@@ -10,32 +10,30 @@ class ClientTest {
   void tcp() async {
     print("tcp demo");
     Socket socket = await Socket.connect('i.aganzai.com', 4041, timeout: Duration(seconds: 5));
-    socket.listen((List<int> event) {
+    Timer t = Timer(Duration(seconds: 5), (){print("timeout");socket.close();});
+    socket.listen((event) {
       tcpString = utf8.decode(event);
       print(tcpString);
+      t.cancel();
+      socket.close();
     });
     socket.add(utf8.encode('hello_tcp'));
-    //tcpString = await socket.transform(utf8.decoder).join();
-    //await socket.close();
-    await Future.delayed(Duration(seconds: 5));
-    socket.close();
-    print(tcpString);
   }
 
   void udp() async {
     print("udp demo");
     RawDatagramSocket socket = await RawDatagramSocket.bind("0.0.0.0", 0);
     var ad = await InternetAddress.lookup('i.aganzai.com');
+    Timer t = Timer(Duration(seconds: 5), (){print("timeout");socket.close();});
     socket.listen((RawSocketEvent e){
       Datagram d = socket.receive();
       if (d == null) return;
       udpString = utf8.decode(d.data);
       print(udpString);
+      t.cancel();
+      socket.close();
     });
     socket.send(utf8.encode("hello_udp"), ad[0], 4041);
-    await Future.delayed(Duration(seconds: 5));
-    socket.close();
-    print(udpString);
   }
 }
 
