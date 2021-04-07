@@ -25,15 +25,14 @@ class ClientTest {
   void udp() async {
     print("udp demo");
     RawDatagramSocket socket = await RawDatagramSocket.bind("0.0.0.0", 0);
-    //InternetAddress ad = new InternetAddress('i.aganzai.com');
-    InternetAddress ad = await new InternetAddress('180.215.24.69');
+    var ad = await InternetAddress.lookup('i.aganzai.com');
     socket.listen((RawSocketEvent e){
       Datagram d = socket.receive();
       if (d == null) return;
       udpString = utf8.decode(d.data);
       print(udpString);
     });
-    socket.send(utf8.encode("hello_udp"), ad, 4041);
+    socket.send(utf8.encode("hello_udp"), ad[0], 4041);
     await Future.delayed(Duration(seconds: 5));
     socket.close();
     print(udpString);
