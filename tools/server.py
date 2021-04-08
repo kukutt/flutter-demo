@@ -10,9 +10,8 @@ class WSserver():
     async def handle(self,websocket,path):
         while True:
             recv_msg = await websocket.recv()
-            print(recv_msg);
             print("[websocket] i received %s" %recv_msg)
-            await websocket.send('server send ok')
+            await websocket.send(recv_msg)
     def run(self):
         print("ws socket port[%d]" % (8240))
         ser = websockets.serve(self.handle,"0.0.0.0","8240")

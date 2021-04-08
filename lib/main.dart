@@ -60,6 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
     p.udp();
     _incrementCounter();
   }
+  
+  void _wstest() {
+    ClientTest p = new ClientTest();
+    p.ws();
+    _incrementCounter();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -132,6 +138,15 @@ class _MyHomePageState extends State<MyHomePage> {
             textColor: Colors.white,
             child: new Text('tcp'),
             onPressed: _tcptest,
+          ),
+          SizedBox(
+            /* */
+            height: 2,
+          ),
+          MaterialButton(color: Colors.blue,
+            textColor: Colors.white,
+            child: new Text('ws'),
+            onPressed: _wstest,
           ),
        ]
   )
