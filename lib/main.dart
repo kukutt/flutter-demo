@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'tcpudp.dart';
+import 'websockettest.dart';
+import 'websockettest2.dart';
+import 'package:web_socket_channel/io.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,6 +51,34 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _message;
+  String debug_str = "debug: []";
+  String send_str = "send: []";
+  String recv_str = "recv: []";
+  IOWebSocketChannel _channel;
+
+  void _sendHandle() {
+    if (_message != null) {
+      setState(() {debug_str = "debug: [111111111111111]";});
+      if (_channel == null){
+        _channel = IOWebSocketChannel.connect("wss://echo.websocket.org");
+        setState(() {debug_str = "debug: [111111111111113 $_channel]";});
+        _channel.stream.listen((message) {
+          setState(() {recv_str = "recv: [$message]";});
+        });
+      }
+      _channel.sink.add(_message);
+      setState(() {send_str = "send: [$_message]";});
+    }else{
+      setState(() {debug_str = "debug: [111111111111112]";});
+    }
+  }
+
+  void _onChangedHandle(value) {
+    setState(() {
+      _message = value.toString();
+    });
+  }
   
   void _tcptest() {
     ClientTest p = new ClientTest();
@@ -69,11 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter+=2;
     });
   }
@@ -110,8 +136,10 @@ class _MyHomePageState extends State<MyHomePage> {
           // center the children vertically; the main axis here is the vertical
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
+            TextField(onChanged: _onChangedHandle),
+            RaisedButton(child: Text('send'), onPressed: _sendHandle),
             Text(
               'You have pushed the button this many times:',
             ),
@@ -119,6 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Text('$debug_str'),
+            Text('$send_str'),
+            Text('$recv_str'),
           ],
         ),
       ),
