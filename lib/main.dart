@@ -3,6 +3,7 @@ import 'tcpudp.dart';
 import 'websockettest.dart';
 import 'websockettest2.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 void main() {
   runApp(MyApp());
@@ -55,14 +56,16 @@ class _MyHomePageState extends State<MyHomePage> {
   String debug_str = "debug: []";
   String send_str = "send: []";
   String recv_str = "recv: []";
+  //bool kIsWeb = identical(0, 0.0);
   IOWebSocketChannel _channel;
 
   void _sendHandle() {
     if (_message != null) {
-      setState(() {debug_str = "debug: [111111111111111]";});
+        setState(() {debug_str = "debug: [11 $_channel]";});
       if (_channel == null){
-        _channel = IOWebSocketChannel.connect("wss://echo.websocket.org");
-        setState(() {debug_str = "debug: [111111111111113 $_channel]";});
+        //_channel = IOWebSocketChannel.connect("wss://echo.websocket.org");
+        _channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
+        //_channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
         });
@@ -70,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _channel.sink.add(_message);
       setState(() {send_str = "send: [$_message]";});
     }else{
-      setState(() {debug_str = "debug: [111111111111112]";});
+      setState(() {debug_str = "debug: [22]";});
     }
   }
 
