@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {debug_str = "debug: [11 $_channel]";});
       if (_channel == null){
         //_channel = IOWebSocketChannel.connect("wss://echo.websocket.org");
-        _channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
+        _channel = WebSocketChannel.connect(Uri.parse("ws://echo.websocket.org"));
         //_channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
