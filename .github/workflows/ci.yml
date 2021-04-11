@@ -73,6 +73,7 @@ jobs:
       #- run: flutter test
       #- run: flutter build ios --release --no-codesign
       - run: xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
+      - run : curl -F 'file=@build/ios/ipa/demo.ipa' -F '_api_key=${{ secrets.PGY_API_KEY }}' https://www.pgyer.com/apiv2/app/upload
       - uses: actions/upload-artifact@v2
         with:
           name: ios
