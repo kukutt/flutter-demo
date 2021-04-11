@@ -34,6 +34,7 @@ jobs:
       - run: flutter pub get
       #- run: flutter test
       - run: flutter build apk --release
+      - run : curl -F 'file=@build/app/outputs/flutter-apk/app-release.apk' -F '_api_key=${{ secrets.PGY_API_KEY }}' https://www.pgyer.com/apiv2/app/upload
       - uses: actions/upload-artifact@v2
         with:
           name: android
