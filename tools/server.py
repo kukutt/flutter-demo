@@ -3,20 +3,32 @@ from time import ctime
 import os 
 import sys
 import _thread
-import asyncio
-import websockets # pip3 install websockets
 
-class WSserver():
-    async def handle(self,websocket,path):
-        while True:
-            recv_msg = await websocket.recv()
-            print("[websocket] i received %s" %recv_msg)
-            await websocket.send(recv_msg)
-    def run(self):
-        print("ws socket port[%d]" % (8240))
-        ser = websockets.serve(self.handle,"0.0.0.0","8240")
-        asyncio.get_event_loop().run_until_complete(ser)
-        asyncio.get_event_loop().run_forever()
+#websocket and http
+#pip3 install flask gevent-websocket flask_sockets
+from flask import Flask
+from flask_sockets import Sockets
+
+app = Flask(__name__)
+sockets = Sockets(app)
+
+def after_request(resp):
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+
+@sockets.route('/echo')
+def echo_socket(ws):
+    while not ws.closed:
+        message = ws.receive()
+        print("监听成功", message)
+        if (None != message):
+            ws.send(message)
+
+@app.route('/hello')
+def index():
+    print("hello");
+    return 'Hello World!!!'
 
 def udpserver( threadName, port):
     host = ''
@@ -61,6 +73,13 @@ def tcpserver( threadName, port):
         print(threadName, addr,'End')
     tcpServer.close() #两次关闭，第一次是tcp对象，第二次是tcp服务器
 
+def httpserver(port):
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    app.after_request(after_request)
+    server = pywsgi.WSGIServer(('0.0.0.0', port), app, handler_class=WebSocketHandler)
+    server.serve_forever()
+
 try:
     for arg in sys.argv[1:]:
         strlist = arg.split(':')
@@ -70,10 +89,9 @@ try:
         if (strlist[0].find("udp") >= 0):
             print("debug_udp", strlist[0], strlist[1])
             _thread.start_new_thread( udpserver, (strlist[0], int(strlist[1]), ) )
-    ws = WSserver()
-    ws.run()
+    httpserver(8240);
 except:
-   print("Error: unable to start thread")
+    print("Error: unable to start thread")
  
 while 1:
-   pass
+    pass
