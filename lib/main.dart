@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'tcpudp.dart';
-//import 'websockettest.dart';
-//import 'websockettest2.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'dart:convert';
+import 'tcpudp.dart';
 
 void main() {
   runApp(MyApp());
@@ -56,19 +57,27 @@ class _MyHomePageState extends State<MyHomePage> {
   String debug_str = "debug: []";
   String send_str = "send: []";
   String recv_str = "recv: []";
+  String http_str = "httpstr NULL";
   //bool kIsWeb = identical(0, 0.0);
-  IOWebSocketChannel _channel;
+  var _channel;
 
-  void _sendHandle() {
+  void _wsbttest() {
     if (_message != null) {
         setState(() {debug_str = "debug: [11 $_channel]";});
       if (_channel == null){
-        _channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
-        //_channel = WebSocketChannel.connect(Uri.parse("ws://echo.websocket.org"));
-        //_channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
+        //_channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
+        //_channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
+        _channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240/echo"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
-        });
+        },onDone: () {
+          setState(() {debug_str = "debug: [11 ws channel closed]";});
+          _channel = null;
+        },
+        onError: (error) {
+          setState(() {debug_str = "debug: [11 ws error $error]";});
+          _channel = null;
+        },);
       }
       _channel.sink.add(_message);
       setState(() {send_str = "send: [$_message]";});
@@ -80,6 +89,33 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onChangedHandle(value) {
     setState(() {
       _message = value.toString();
+    });
+  }
+
+
+  void _httpbttest() async {
+    setState(() {
+      http_str = "start...";
+    });
+
+    String result;
+    try {
+      var client = http.Client();
+      var response = await client.get(Uri.parse("http://i.aganzai.com:8240/hello"));
+      //var response = await client.get(Uri.parse("https://httpbin.org/ip"));
+      if (response.statusCode == 200) {
+        result = response.body;
+      } else {
+        result =
+            'Error getting IP address:\nHttp status ${response.statusCode}';
+      }
+      await client.close();
+    } catch (exception) {
+      result = 'Failed getting IP address $exception';
+    }
+
+    setState(() {
+      http_str = result;
     });
   }
   
@@ -142,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             TextField(onChanged: _onChangedHandle),
-            RaisedButton(child: Text('send'), onPressed: _sendHandle),
+            RaisedButton(child: Text('ws_send'), onPressed: _wsbttest),
             Text(
               'You have pushed the button this many times:',
             ),
@@ -153,6 +189,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Text('$debug_str'),
             Text('$send_str'),
             Text('$recv_str'),
+            RaisedButton(child: Text('http_test'), onPressed: _httpbttest),
+            Text('$http_str'),
           ],
         ),
       ),
