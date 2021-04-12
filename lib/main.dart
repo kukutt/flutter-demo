@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'tcpudp.dart';
-//import 'websockettest.dart';
-//import 'websockettest2.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'tcpudp.dart';
 
 void main() {
   runApp(MyApp());
@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String debug_str = "debug: []";
   String send_str = "send: []";
   String recv_str = "recv: []";
+  String http_str = "httpstr NULL";
   //bool kIsWeb = identical(0, 0.0);
   IOWebSocketChannel _channel;
 
@@ -63,8 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_message != null) {
         setState(() {debug_str = "debug: [11 $_channel]";});
       if (_channel == null){
-        _channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
-        //_channel = WebSocketChannel.connect(Uri.parse("ws://echo.websocket.org"));
+        //_channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
+        _channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
         //_channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
@@ -80,6 +81,37 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onChangedHandle(value) {
     setState(() {
       _message = value.toString();
+    });
+  }
+
+
+  void _httptest() async {
+    var url = 'https://httpbin.org/ip';
+    var httpClient = new HttpClient();
+
+
+    setState(() {
+      http_str = "start...";
+    });
+
+    String result;
+    try {
+      var request = await httpClient.getUrl(Uri.parse(url));
+      var response = await request.close();
+      if (response.statusCode == HttpStatus.OK) {
+        var json = await response.transform(utf8.decoder).join();
+        var data = jsonDecode(json);
+        result = data['origin'];
+      } else {
+        result =
+            'Error getting IP address:\nHttp status ${response.statusCode}';
+      }
+    } catch (exception) {
+      result = 'Failed getting IP address';
+    }
+
+    setState(() {
+      http_str = result;
     });
   }
   
@@ -153,6 +185,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Text('$debug_str'),
             Text('$send_str'),
             Text('$recv_str'),
+            RaisedButton(child: Text('http_test'), onPressed: _httptest),
+            Text('$http_str'),
           ],
         ),
       ),
