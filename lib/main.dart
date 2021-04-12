@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String recv_str = "recv: []";
   String http_str = "httpstr NULL";
   //bool kIsWeb = identical(0, 0.0);
-  IOWebSocketChannel _channel;
+  var _channel;
 
   void _wsbttest() {
     if (_message != null) {
@@ -70,7 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
         _channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240/echo"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
-        });
+        },onDone: () {
+          setState(() {debug_str = "debug: [11 ws channel closed]";});
+          _channel = null;
+        },
+        onError: (error) {
+          setState(() {debug_str = "debug: [11 ws error $error]";});
+          _channel = null;
+        },);
       }
       _channel.sink.add(_message);
       setState(() {send_str = "send: [$_message]";});

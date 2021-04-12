@@ -42,7 +42,7 @@ class ClientTest {
 
   void ws() async {
     print("ws demo");
-    var channel = IOWebSocketChannel.connect(Uri.parse('ws://i.aganzai.com:8240/'));
+    var channel = IOWebSocketChannel.connect(Uri.parse('ws://i.aganzai.com:8240/echo'));
 
     Timer t = Timer(Duration(seconds: 5), (){print("timeout");channel.sink.close();});
     channel.stream.listen((message) {
