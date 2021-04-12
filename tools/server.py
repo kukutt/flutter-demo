@@ -1,8 +1,9 @@
 from socket import *
-from time import ctime
 import os 
 import sys
 import _thread
+import gevent
+import time
 
 #websocket and http
 #pip3 install flask gevent-websocket flask_sockets
@@ -20,9 +21,12 @@ def after_request(resp):
 @sockets.route('/echo')
 def echo_socket(ws):
     while not ws.closed:
-        message = ws.receive()
+        message = gevent.with_timeout(5, ws.receive, timeout_value="timeout")
+        #message = ws.receive()
         print("监听成功", message)
-        if (None != message):
+        if ("timeout" == message):
+            ws.send("timeout[%f]" % (time.time()));
+        elif (None != message):
             ws.send(message)
 
 @app.route('/hello')
