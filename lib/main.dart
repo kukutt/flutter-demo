@@ -65,8 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {debug_str = "debug: [11 $_channel]";});
       if (_channel == null){
         //_channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
-        _channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
-        //_channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
+        //_channel = WebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
+        _channel = WebSocketChannel.connect(Uri.parse("ws://i.aganzai.com:8240"));
         _channel.stream.listen((message) {
           setState(() {recv_str = "recv: [$message]";});
         });
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   void _httptest() async {
-    var url = 'https://httpbin.org/ip';
+    var url = 'http://httpbin.org/ip';
     var httpClient = new HttpClient();
 
 
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
             'Error getting IP address:\nHttp status ${response.statusCode}';
       }
     } catch (exception) {
-      result = 'Failed getting IP address';
+      result = 'Failed getting IP address $exception';
     }
 
     setState(() {
